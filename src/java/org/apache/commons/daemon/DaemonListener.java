@@ -19,7 +19,12 @@ package org.apache.commons.daemon;
 
 import java.util.EventListener;
 
-public interface DaemonListener extends EventListener {
+/**
+ * EvenListener type wrapper.
+ * @version 1.0 <i>(SVN $Revision$)</i>
+ */
+public interface DaemonListener extends EventListener
+{
 
 }
 

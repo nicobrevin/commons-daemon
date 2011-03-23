@@ -27,11 +27,15 @@
 <section name="Introduction">
 <p>
       Jsvc is a set of libraries and applications for making Java
-      applications run on UNIX more easily. It can run on win32 via
-      the cygwin emulation layer (see 
-      <a href="http://www.cygwin.com/"> cygwin</a> for more information),
-      however win32 users may prefer to use <a href="procrun.html"> procrun</a>
-      instead.
+      applications run on UNIX more easily.
+      <br/>
+      Jsvc allows the application (e.g. Tomcat) to perform some privileged operations as root
+      (e.g. bind to a port &lt; 1024), and then switch identity to a non-privileged user.
+      <br/>
+      It can run on Win32 via the Cygwin emulation layer (see
+      <a href="http://www.cygwin.com/"> Cygwin</a> for more information),
+      however Win32 users may prefer to use <a href="procrun.html"> procrun</a>
+      instead, which allows the application to run as a Windows Service.
 </p>
 <p>
       The sources are located in the src/native/unix subdirectory.
@@ -111,6 +115,8 @@ Usage: jsvc [-options] class [args...]
 
 Where options include:
 
+    -help | --help | -?
+        show this help page (implies -nodetach)
     -jvm &lt;JVM name&gt;
         use a specific Java Virtual Machine. Available JVMs:
             'client' 'server'
@@ -122,8 +128,9 @@ Where options include:
     -version
         show the current Java environment version (to check
         correctness of -home and -jvm. Implies -nodetach)
-    -help / -?
-        show this help page (implies -nodetach)
+    -showversion
+        show the current Java environment version (to check
+        correctness of -home and -jvm) and continue execution.
     -nodetach
         don't detach from parent process and become a daemon
     -debug
@@ -147,17 +154,51 @@ Where options include:
         set a Java system property
     -X&lt;option&gt;
         set Virtual Machine specific option
-    -procname &lt;process name&gt;
-        Allows the process name to be configured on Linux
+    -ea[:&lt;packagename&gt;...|:&lt;classname&gt;]
+    -enableassertions[:&lt;packagename&gt;...|:&lt;classname&gt;]
+        enable assertions
+    -da[:&lt;packagename&gt;...|:&lt;classname&gt;]
+    -disableassertions[:&lt;packagename&gt;...|:&lt;classname&gt;]
+        disable assertions
+    -esa | -enablesystemassertions
+        enable system assertions
+    -dsa | -disablesystemassertions
+        disable system assertions
+    -agentlib:&lt;libname&gt;[=&lt;options&gt;]
+        load native agent library &lt;libname&gt;, e.g. -agentlib:hprof
+    -agentpath:&lt;pathname&gt;[=&lt;options&gt;]
+        load native agent library by full pathname
+    -javaagent:&lt;jarpath&gt;[=&lt;options&gt;]
+        load Java programming language agent, see java.lang.instrument
+    -procname &lt;procname&gt;
+        use the specified process name (works only for Linux)
     -wait &lt;waittime&gt;
         wait waittime seconds for the service to start
         waittime should multiple of 10 (min=10)
     -stop
         stop the service using the file given in the -pidfile option
+    -keepstdin
+        does not redirect stdin to /dev/null
 
 </source>
 </p>
+<subsection name="Mac OS X universal binaries">
+<p>
+If jsvc was build with universal binary support the proper way of
+starting <code>jsvc</code> is by using Mac OS X <code>arch</code> command:
+</p>
+<source>
+    arch -arch i386 ./jsvc -jvm server &lt;original jsvc parameters&gt;
 
+    for running 64-bit JVM use the:
+    arch -arch x86_64 ./jsvc -jvm server &lt;original jsvc parameters&gt;
+
+</source>
+<p>
+Use <code>-jvm server</code> because default <code>client</code> JVM is
+not present for all architectures.
+</p>
+</subsection>
 </section>
 <section name="Using jsvc">
 <p>
@@ -192,7 +233,7 @@ Write a Class (MyClass) that implements the following methods:
 </ul>
 Store it in a jarfile and use as above:
 <source>
-./jsvc -cp commons-daemon.jar:my.jar MyClass
+./jsvc -cp my.jar MyClass
 </source>
 </p>
 </subsection>
@@ -237,7 +278,7 @@ In child(): controlled process.
   load_service().
   start_service().
   say "I am ready"
-  wait for signal or pool for stop
+  wait for signal or poll for stop
   stop_service().
   destroy_service().
   destroy_JVM().
@@ -249,7 +290,7 @@ Note: The controller process uses signals to stop the controlled process.
 
 <subsection name="Downgrading user">
 <p>
-On linux <code>setuid()</code>/<code>setgid()</code> + capabilities are used. On other unix <code>setgid</code>/<code>initgroups</code> are used.
+On Linux <code>setuid()</code>/<code>setgid()</code> + capabilities are used. On other unix <code>setgid</code>/<code>initgroups</code> are used.
 
 We have something like:
 <source>

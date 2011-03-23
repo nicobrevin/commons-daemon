@@ -23,9 +23,10 @@ package org.apache.commons.daemon;
  * communicate with the Daemon container.
  *
  * @author Pier Fumagalli
- * @version 1.0 <i>(CVS $Revision$)</i>
+ * @version 1.0 <i>(SVN $Revision$)</i>
  */
-public interface DaemonContext {
+public interface DaemonContext
+{
 
     /**
      * Returns  <code>DaemonController</code> object that can be used
@@ -43,3 +44,4 @@ public interface DaemonContext {
     public String[] getArguments();
 
 }
+

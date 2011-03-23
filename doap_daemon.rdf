@@ -23,7 +23,7 @@
     <category rdf:resource="http://projects.apache.org/category/library"/>
     <license rdf:resource="http://usefulinc.com/doap/licenses/asl20"/>
     <bug-database rdf:resource="http://issues.apache.org/jira/browse/DAEMON"/>
-    <download-page rdf:resource="http://jakarta.apache.org/site/downloads/downloads_commons-daemon.cgi"/>
+    <download-page rdf:resource="http://commons.apache.org/downloads/download_daemon.cgi"/>
     <asfext:pmc rdf:resource="http://commons.apache.org/"/>
     <shortdesc xml:lang="en">Commons Daemon</shortdesc>
     <description xml:lang="en">Commons Daemon</description>
@@ -36,8 +36,13 @@
     <release>
       <Version>
         <name>commons-daemon</name>
-        <created>2005-05-17</created>
-        <revision>1.0.1</revision>
+        <created>2010-08-03</created>
+        <revision>1.0.3</revision>
+      </Version>
+      <Version>
+        <name>commons-daemon</name>
+        <created>2010-02-25</created>
+        <revision>1.0.2</revision>
       </Version>
     </release>
     <mailing-list rdf:resource="http://commons.apache.org/mail-lists.html"/>

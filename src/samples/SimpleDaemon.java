@@ -17,24 +17,33 @@
 
 /* @version $Id$ */
 
-import java.io.*;
-import java.net.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+//import java.io.UnsupportedEncodingException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
+
 import org.apache.commons.daemon.Daemon;
-import org.apache.commons.daemon.DaemonController;
 import org.apache.commons.daemon.DaemonContext;
+import org.apache.commons.daemon.DaemonController;
+import org.apache.commons.daemon.DaemonInitException;
 
 public class SimpleDaemon implements Daemon, Runnable {
 
     private ServerSocket server=null;
     private Thread thread=null;
     private DaemonController controller=null;
-    private boolean stopping=false;
+    private volatile boolean stopping=false;
     private String directory=null;
-    private Vector handlers=null;
+    private final Vector handlers;
 
     public static native void toto();
 
@@ -61,8 +70,13 @@ public class SimpleDaemon implements Daemon, Runnable {
         int port=1200;
 
         String[] a = context.getArguments();
-
-        if (a.length>0) port=Integer.parseInt(a[0]);
+        try {
+            if ( a.length > 0)
+                port=Integer.parseInt(a[0]);
+        }
+        catch (NumberFormatException ex) {
+            throw new DaemonInitException("parsing port", ex);
+        }
         if (a.length>1) this.directory=a[1];
         else this.directory="/tmp";
 
@@ -146,11 +160,11 @@ public class SimpleDaemon implements Daemon, Runnable {
 
     public static class Handler implements Runnable {
 
-        private DaemonController controller=null;
-        private SimpleDaemon parent=null;
-        private String directory=null;
-        private Socket socket=null;
-        private int number=0;
+        private final DaemonController controller;
+        private final SimpleDaemon parent;
+        private String directory=null; // Only set before thread is started
+        private final Socket socket;
+        private int number=0; // Only set before thread is started
 
         public Handler(Socket s, SimpleDaemon p, DaemonController c) {
             super();
@@ -222,11 +236,11 @@ public class SimpleDaemon implements Daemon, Runnable {
 
         public void handle(InputStream in, OutputStream os) {
             PrintStream out=null;
-            try {
-                out=new PrintStream(os, true, "US-ASCII");
-            } catch (UnsupportedEncodingException ex) {
-                out=new PrintStream(os);
-            }
+//            try {
+//                out=new PrintStream(os, true, "US-ASCII"); // Java 1.4+
+//            } catch (UnsupportedEncodingException ex) {
+                out=new PrintStream(os, true);
+//            }
 
             while(true) {
                 try {

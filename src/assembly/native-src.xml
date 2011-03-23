@@ -27,6 +27,8 @@
                 <include>LICENSE.txt</include>
                 <include>NOTICE.txt</include>
                 <include>RELEASE-NOTES.txt</include>
+                <!-- Includes build instructions -->
+                <include>README</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -34,8 +36,11 @@
             <outputDirectory>unix</outputDirectory>
             <lineEnding>lf</lineEnding>
             <excludes>
-                <exclude>**/*.sh</exclude>
+                <exclude>**/*.sh</exclude> <!-- Excluded here, because processed below -->
                 <exclude>configure</exclude>
+                <exclude>autom4te.cache/**</exclude>
+                <!-- Bug http://jira.codehaus.org/browse/MASSEMBLY-462 -->
+                <exclude>**/*.formatted</exclude>
             </excludes>
         </fileSet>
         <fileSet>
@@ -49,21 +54,35 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>src/native/nt/procrun</directory>
+            <directory>src/samples</directory>
+            <outputDirectory>unix/samples</outputDirectory>
+            <lineEnding>lf</lineEnding>
+            <fileMode>775</fileMode>
+            <includes>
+                <include>Tomcat5.sh</include>
+                <include>Tomcat7.sh</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>src/native/windows</directory>
             <outputDirectory>windows</outputDirectory>
             <lineEnding>crlf</lineEnding>
             <excludes>
                 <exclude>**/*.ico</exclude>
                 <exclude>**/*.bmp</exclude>
+                <exclude>**/*.rc</exclude>
+                <!-- Bug http://jira.codehaus.org/browse/MASSEMBLY-462 -->
+                <exclude>**/*.formatted</exclude>
             </excludes>
             <fileMode>664</fileMode>
         </fileSet>
         <fileSet>
-            <directory>src/native/nt/procrun</directory>
+            <directory>src/native/windows</directory>
             <outputDirectory>windows</outputDirectory>
             <includes>
                 <include>**/*.ico</include>
                 <include>**/*.bmp</include>
+                <include>**/*.rc</include>
             </includes>
             <fileMode>664</fileMode>
         </fileSet>

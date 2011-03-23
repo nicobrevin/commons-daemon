@@ -19,9 +19,9 @@ package org.apache.commons.daemon;
 
 /**
  * This interface provides support for native daemon invocation. Using
- * a platform dependant helper program classes that implement the
+ * a platform dependant helper program, classes that implement the
  * <code>Daemon</code> interface can be initialized, started and
- * stopped according to the convensions of the underlying operating
+ * stopped according to the conventions of the underlying operating
  * system.
  * <p>
  * Implementors of this interface must also provide a public constructor
@@ -31,7 +31,8 @@ package org.apache.commons.daemon;
  * @author Pier Fumagalli
  * @version 1.0 <i>(CVS $Revision$)</i>
  */
-public interface Daemon {
+public interface Daemon
+{
 
     /**
      * Initialize this <code>Daemon</code> instance.
@@ -62,12 +63,14 @@ public interface Daemon {
      *
      * @param context A <code>DaemonContext</code> object used to
      * communicate with the container.
-     * 
+     * @exception DaemonInitException An exception that prevented 
+     * initialization where you want to display a nice message to the user,
+     * rather than a stack trace.
      * @exception Exception Any exception preventing a successful
      *                      initialization.
      */
     public void init(DaemonContext context)
-    throws Exception;
+        throws DaemonInitException, Exception;
 
     /**
      * Start the operation of this <code>Daemon</code> instance. This
@@ -79,7 +82,7 @@ public interface Daemon {
      * the stop()-method.
      */
     public void start()
-    throws Exception;
+        throws Exception;
 
     /**
      * Stop the operation of this <code>Daemon</code> instance. Note
@@ -89,7 +92,7 @@ public interface Daemon {
      * stop().
      */
     public void stop()
-    throws Exception;
+        throws Exception;
 
     /**
      * Free any resources allocated by this daemon such as file
@@ -100,3 +103,4 @@ public interface Daemon {
      */
     public void destroy();
 }
+

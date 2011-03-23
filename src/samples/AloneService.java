@@ -17,22 +17,18 @@
 
 /* @version $Id$ */
 
-import java.io.*;
-import java.net.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.Enumeration;
-
-import org.apache.commons.collections.ExtendedProperties;
-import java.io.IOException;
-import java.util.Iterator;
+import java.util.Properties;
 
 /*
- * That is like the ServiceDaemon but it does used the interface.
+ * That is like the ServiceDaemon but it does not use the Daemon interface.
  */
 public class AloneService {
 
-    private ExtendedProperties prop = null;
+    private Properties prop = null;
     private Process proc[] = null;
     private ServiceDaemonReadThread readout[] = null;
     private ServiceDaemonReadThread readerr[] = null;
@@ -48,17 +44,23 @@ public class AloneService {
     public void init(String[] arguments)
     throws Exception {
         /* Set the err */
-        System.setErr(new PrintStream(new FileOutputStream(new File("/ServiceDaemon.err"),true)));
+        System.setErr(new PrintStream(new FileOutputStream("/ServiceDaemon.err",true)));
         System.err.println("ServiceDaemon: instance "+this.hashCode()+
                            " init");
 
         /* read the properties file */
-        prop = new ExtendedProperties("startfile");
-
+        prop = new Properties();
+        try {
+            prop.load(new FileInputStream("startfile"));
+        }
+        catch (Exception e) {
+            // Cannot find startfile.properties.
+            // XXX: Should we print something?
+        }
         /* create an array to store the processes */
         int i=0;
-        for (Iterator e = prop.getKeys(); e.hasNext() ;) {
-            e.next();
+        for (Enumeration e = prop.keys(); e.hasMoreElements() ;) {
+            e.nextElement();
             i++;
         }
         System.err.println("ServiceDaemon: init for " + i + " processes");
@@ -81,11 +83,11 @@ public class AloneService {
 
         /* Start */
         int i=0;
-        for (Iterator e = prop.getKeys(); e.hasNext() ;) {
-           String name = (String) e.next();
-           System.err.println("ServiceDaemon: starting: " + name + " : " + prop.getString(name));
+        for (Enumeration e = prop.keys(); e.hasMoreElements() ;) {
+           String name = (String) e.nextElement();
+           System.err.println("ServiceDaemon: starting: " + name + " : " + prop.getProperty(name));
            try {
-               proc[i] = Runtime.getRuntime().exec(prop.getString(name));
+               proc[i] = Runtime.getRuntime().exec(prop.getProperty(name));
            } catch(Exception ex) {
                System.err.println("Exception: " + ex);
            }
@@ -100,8 +102,7 @@ public class AloneService {
         }
     }
 
-    public void stop()
-    throws IOException, InterruptedException {
+    public void stop() {
         /* Dump a message */
         System.err.println("ServiceDaemon: stopping");
 

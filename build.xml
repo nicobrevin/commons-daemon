@@ -59,7 +59,7 @@
   <property name="component.title"         value="Java Daemons"/>
 
   <!-- The current version number of this component -->
-  <property name="component.version"       value="1.0.2"/>
+  <property name="component.version"       value="1.0.6-dev"/>
 
   <!-- The base directory for compilation targets -->
   <property name="build.home"              value="target"/>
@@ -82,10 +82,10 @@
   <!-- The pattern to be used to grab ant jars (usefull for non standard layout)  -->
   <property name="ant.jars.pattern"        value="*.jar"/>
 
-  <!-- Name of the native arctifacts  -->
+  <!-- Name of the native artifacts  -->
   <property name="native.name"             value="commons-${component.name}-${component.version}-native-src"/>
 
-  <!-- Path of the native arctifacts  -->
+  <!-- Path of the native artifacts  -->
   <property name="native.path"             value="${dist.home}/bin/native/${native.name}"/>
 
 
@@ -156,6 +156,8 @@
     <javac  srcdir="${source.home}"
            destdir="${build.home}/classes"
              debug="${compile.debug}"
+            source="${compile.source}"
+            target="${compile.target}"
        deprecation="${compile.deprecation}"
           optimize="${compile.optimize}">
       <classpath refid="compile.classpath"/>
@@ -177,7 +179,7 @@
     <javac  srcdir="${test.home}"
            destdir="${build.home}/tests"
              debug="${compile.debug}"
-            source="${compile.source}" 
+            source="${compile.source}"
             target="${compile.target}"
        deprecation="${compile.deprecation}"
           optimize="${compile.optimize}">
@@ -212,7 +214,7 @@
                 version="true"
                doctitle="&lt;h1&gt;${component.title}&lt;/h1&gt;"
             windowtitle="${component.title} (Version ${component.version})"
-                 bottom="Copyright (c) 2002-2010 - Apache Software Foundation">
+                 bottom="Copyright (c) 2002-2011 - Apache Software Foundation">
       <classpath refid="compile.classpath"/>
       <classpath location="${ant.lib}/ant.jar"/>
     </javadoc>
@@ -237,8 +239,12 @@
         -->
       <fileset dir="src/native/unix" />
     </copy>
+    <copy file="src/samples/Tomcat5.sh"
+          todir="${native.path}/unix/samples"/>
+    <copy file="src/samples/Tomcat7.sh"
+          todir="${native.path}/unix/samples"/>
     <copy todir="${native.path}/windows">
-      <fileset dir="src/native/nt/procrun" />
+      <fileset dir="src/native/windows" />
     </copy>
     <copy file="LICENSE.txt"
           todir="${native.path}"/>
@@ -252,10 +258,12 @@
         <include name="${native.name}/**" />
         <exclude name="${native.name}/unix/configure" />
         <exclude name="${native.name}/unix/support/*.sh" />
+        <exclude name="${native.name}/unix/samples/*.sh" />
       </tarfileset>
       <tarfileset dir="${dist.home}/bin/native" mode="755">
         <include name="${native.name}/unix/configure" />
         <include name="${native.name}/unix/support/*.sh" />
+        <include name="${native.name}/unix/samples/*.sh" />
       </tarfileset>
     </tar>
     <zip zipfile="${dist.home}/bin/${native.name}.zip">
@@ -263,10 +271,12 @@
         <include name="${native.name}/**" />
         <exclude name="${native.name}/unix/configure" />
         <exclude name="${native.name}/unix/support/*.sh" />
+        <exclude name="${native.name}/unix/samples/*.sh" />
       </zipfileset>
       <zipfileset dir="${dist.home}/bin/native" filemode="755">
         <include name="${native.name}/unix/configure" />
         <include name="${native.name}/unix/support/*.sh" />
+        <include name="${native.name}/unix/samples/*.sh" />
       </zipfileset>
     </zip>
 
@@ -290,7 +300,7 @@
             <attribute name="Specification-Version" value="${component.version}"/>
             <attribute name="Specification-Vendor" value="Apache Software Foundation"/>
             <attribute name="Implementation-Title" value="Commons Daemon"/>
-            <attribute name="Implementation-Version" value="${component.version}"/> 
+            <attribute name="Implementation-Version" value="${component.version}"/>
             <attribute name="Implementation-Vendor" value="Apache Software Foundation"/>
             <attribute name="Implementation-Vendor-Id" value="org.apache"/>
             <attribute name="X-Compile-Source-JDK" value="${compile.source}"/>
