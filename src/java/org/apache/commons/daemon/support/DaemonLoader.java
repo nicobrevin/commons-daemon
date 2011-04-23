@@ -40,6 +40,7 @@ public final class DaemonLoader
     private static Method start     = null; //@GuardedBy("this")
     private static Method stop      = null; //@GuardedBy("this")
     private static Method destroy   = null; //@GuardedBy("this")
+    private static Method softReload    = null; //@GuardedBy("this") 
 
     public static void version()
     {
@@ -94,6 +95,22 @@ public final class DaemonLoader
         /* The class was loaded and instantiated correctly, we can return
          */
         return true;
+    }
+
+    public static boolean softReload() {
+      try {
+        if (softReload != null) {
+          softReload.invoke(daemon, new Object[0]);
+          return true;
+        } else {
+          System.out.println("Daemon doesn't support soft reloading");
+          return false;
+        }
+      } catch (Throwable ex) {
+        System.err.println("unable to reload daemon: " + ex);
+        ex.printStackTrace(System.err);
+        return false;
+      }
     }
 
     public static boolean load(String className, String args[])
@@ -161,6 +178,12 @@ public final class DaemonLoader
             start   = c.getMethod("start", myclass);
             stop    = c.getMethod("stop", myclass);
             destroy = c.getMethod("destroy", myclass);
+
+            try {
+                softReload = c.getMethod("softReload", myclass);
+            } catch (NoSuchMethodException e) {
+                System.err.println("Daemon does not support reload");
+            }
 
             /* Create a new instance of the daemon */
             daemon = c.newInstance();

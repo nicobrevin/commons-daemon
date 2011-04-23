@@ -105,6 +105,31 @@ char *java_library(arg_data *args, home_data *data)
 
 typedef jint (*jvm_create_t)(JavaVM **, JNIEnv **, JavaVMInitArgs *);
 
+bool java_softreload(void)
+{
+    jmethodID method;
+    jboolean ret;
+    char start[] = "softReload";
+    char startparams[] = "()Z";
+
+    jsvc_xlate_to_ascii(start);
+    jsvc_xlate_to_ascii(startparams);
+    method = (*env)->GetStaticMethodID(env, cls, start, startparams);
+    if (method == NULL) {
+        log_error("Cannot find Daemon Loader \"softReload\" method");
+        return false;
+    }
+
+    ret = (*env)->CallStaticBooleanMethod(env, cls, method);
+    if (ret == FALSE) {
+        log_error("Cannot signal daemon to reload softly");
+        return false;
+    }
+
+    log_debug("Daemon signalled successfully");
+    return true;
+}
+
 /* Initialize the JVM and its environment, loading libraries and all */
 bool java_init(arg_data *args, home_data *data)
 {
